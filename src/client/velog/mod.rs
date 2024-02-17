@@ -17,12 +17,12 @@ use super::Parser;
 #[derive(Default)]
 pub struct Velog {
     pub webhook_url: String,
-    last_post: VelogPost
+    last_posts: Vec<VelogPost>
 }
 
 #[async_trait]
 impl Parser for Velog {
-    type Post = VelogPost;
+    type Post = Vec<VelogPost>;
 
     fn new(url: &str) -> Self {
         Velog {
@@ -68,11 +68,11 @@ impl Parser for Velog {
 
         match deserialized {
             Ok(res) => {
-                res.data.trending_posts[res.data.trending_posts.len() - 1].clone()
+                res.data.trending_posts.clone()
             },
             Err(err) => {
                 println!("역직렬화 하는 도중 에러가 났습니다! {}", err.to_string());
-                VelogPost::default()
+                Vec::new()
             }
         }
     }
@@ -80,13 +80,31 @@ impl Parser for Velog {
     async fn ticker(mut self) {
         loop {
             let last_post = self.last_post().await;
-            if last_post.title.ne(&self.last_post.title) {
-                let webhook_url = self.webhook_url.clone();
-                let body_data = make_webhook(last_post.clone());
-                super::send_webhook(webhook_url, body_data).await;
-            }
 
-            self.last_post = last_post;
+            let check_is_contains = |title: &String| -> bool {
+                let mut flag = false;
+                self.last_posts.iter().for_each(|v| {
+                    if flag {
+                        return
+                    }
+
+                    if v.title.eq(title) {
+                        flag = true;
+                    }
+                });
+
+                flag
+            };
+
+            last_post.iter().for_each(|v| {
+                if check_is_contains(&v.title) {
+                    let webhook_url = self.webhook_url.clone();
+                    let body_data = make_webhook(v.clone());
+                    tokio::task::spawn(super::send_webhook(webhook_url, body_data));
+                }
+            });
+
+            self.last_posts = last_post;
             std::thread::sleep(std::time::Duration::from_secs(60))
         }
     }

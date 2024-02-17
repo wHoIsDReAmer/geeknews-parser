@@ -10,7 +10,7 @@ const VELOG_WEBHOOK: &'static str = "YOUR_WEBHOOK_HERE";
 
 #[tokio::main]
 async fn main() {
-    println!("Geeknews Parser");
+    println!("News Parser");
 
     let hada = HadaGeekNews::new(HADA_WEBHOOK);
     let velog = Velog::new(VELOG_WEBHOOK);

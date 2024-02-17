@@ -25,37 +25,34 @@ impl Parser for HadaGeekNews {
             .build()
             .unwrap();
 
-        let body = client.get("https://news.hada.io/new")
+        if let Ok(result) = client.get("https://news.hada.io/new")
             .send()
-            .await
-            .unwrap()
-            .text()
-            .await
-            .unwrap_or("".into());
+            .await {
+            let body = result.text().await.unwrap_or("".into());
+            let topic = body.split("<div class=\'topic_row\'>").collect::<Vec<&str>>();
 
-        // println!("{}", body);
+            let topic_title = topic[1].split("<div class=topictitle>").collect::<Vec<&str>>();
+            let topic_title = topic_title[1].split("<h1>").collect::<Vec<&str>>();
 
-        let topic = body.split("<div class=\'topic_row\'>").collect::<Vec<&str>>();
+            let topic_link = topic[1].split("<a href='").collect::<Vec<&str>>()[1];
+            let topic_id = topic_title[1].split("<a href='").collect::<Vec<&str>>()[1];
 
-        let topic_title = topic[1].split("<div class=topictitle>").collect::<Vec<&str>>();
-        let topic_title = topic_title[1].split("<h1>").collect::<Vec<&str>>();
+            let topic_desc = topic[1].split(" breakall'>").collect::<Vec<&str>>()[1];
 
-        let topic_link = topic[1].split("<a href='").collect::<Vec<&str>>()[1];
-        let topic_id = topic_title[1].split("<a href='").collect::<Vec<&str>>()[1];
+            let topic_link = topic_link.split("'").collect::<Vec<&str>>()[0];
+            let topic_desc = topic_desc.split("<").collect::<Vec<&str>>()[0];
+            let topic_id = topic_id.split("'").collect::<Vec<&str>>()[0];
+            let topic_title = topic_title[1].split("</h1>").collect::<Vec<&str>>()[0];
 
-        let topic_desc = topic[1].split(" breakall'>").collect::<Vec<&str>>()[1];
-
-        let topic_link = topic_link.split("'").collect::<Vec<&str>>()[0];
-        let topic_desc = topic_desc.split("<").collect::<Vec<&str>>()[0];
-        let topic_id = topic_id.split("'").collect::<Vec<&str>>()[0];
-        let topic_title = topic_title[1].split("</h1>").collect::<Vec<&str>>()[0];
-
-        PublicPost {
-            title: topic_title.to_string(),
-            content: topic_desc.to_string(),
-            link: format!("https://news.hada.io/{}", topic_id),
-            href: topic_link.to_string()
+            return PublicPost {
+                title: topic_title.to_string(),
+                content: topic_desc.to_string(),
+                link: format!("https://news.hada.io/{}", topic_id),
+                href: topic_link.to_string()
+            }
         }
+
+        PublicPost::default()
     }
 
     async fn ticker(mut self) {
