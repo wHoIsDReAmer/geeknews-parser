@@ -3,6 +3,7 @@ mod request;
 mod response;
 
 use std::fmt::{Debug, Display};
+use std::time::Duration;
 use async_trait::async_trait;
 use reqwest::header::CONTENT_TYPE;
 use serde::{Deserialize, Serialize};
@@ -113,7 +114,7 @@ impl Parser for Velog {
             });
 
             self.last_posts = last_post;
-            std::thread::sleep(std::time::Duration::from_secs(60))
+            let _ = tokio::time::sleep(Duration::from_secs(60));
         }
     }
 }

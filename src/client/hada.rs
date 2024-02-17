@@ -1,4 +1,5 @@
 use std::fmt::{Debug, Display};
+use std::time::Duration;
 use async_trait::async_trait;
 use super::PublicPost;
 use super::Parser;
@@ -66,7 +67,7 @@ impl Parser for HadaGeekNews {
             }
 
             self.last_post = post;
-            std::thread::sleep(std::time::Duration::from_secs(1))
+            let _ = tokio::time::sleep(Duration::from_secs(1));
         }
     }
 }
