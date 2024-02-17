@@ -54,27 +54,31 @@ impl Parser for Velog {
 
         let serialized = serde_json::to_string(&gql_body).unwrap();
 
-        let result = client.post("https://v3.velog.io/graphql")
+        if let Ok(result) = client.post("https://v3.velog.io/graphql")
             .header(CONTENT_TYPE, "application/json")
             .body(serialized)
             .send()
-            .await
-            .unwrap()
-            .text()
-            .await
-            .unwrap();
+            .await {
 
-        let deserialized: Result<VelogResponse, serde_json::Error> = serde_json::from_str(&result);
+            let result = result
+                .text()
+                .await
+                .unwrap();
 
-        match deserialized {
-            Ok(res) => {
-                res.data.trending_posts.clone()
-            },
-            Err(err) => {
-                println!("역직렬화 하는 도중 에러가 났습니다! {}", err.to_string());
-                Vec::new()
+            let deserialized: Result<VelogResponse, serde_json::Error> = serde_json::from_str(&result);
+
+            match deserialized {
+                Ok(res) => {
+                    return res.data.trending_posts.clone()
+                },
+                Err(err) => {
+                    println!("역직렬화 하는 도중 에러가 났습니다! {}", err.to_string());
+                    return Vec::new()
+                }
             }
         }
+
+        Vec::new()
     }
 
     async fn ticker(mut self) {
