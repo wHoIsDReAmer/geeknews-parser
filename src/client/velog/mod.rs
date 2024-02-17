@@ -97,6 +97,10 @@ impl Parser for Velog {
                     }
                 });
 
+                if self.last_posts.len() == 0 {
+                    flag = true
+                }
+
                 flag
             };
 
