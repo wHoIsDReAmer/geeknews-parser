@@ -15,5 +15,5 @@ async fn main() {
     let hada = HadaGeekNews::new(HADA_WEBHOOK);
     let velog = Velog::new(VELOG_WEBHOOK);
 
-    let _ = tokio::join!(hada.ticker());
+    let _ = tokio::join!(hada.ticker(), velog.ticker());
 }
