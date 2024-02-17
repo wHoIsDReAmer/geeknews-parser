@@ -59,6 +59,10 @@ impl Parser for HadaGeekNews {
     async fn ticker(mut self) {
         loop {
             let post = self.last_post().await;
+            if post.title.eq("") {
+                let _ = tokio::time::sleep(Duration::from_secs(1));
+                continue
+            }
 
             if self.last_post.title.ne(&post.title) {
                 let webhook_url = self.webhook_url.clone();
