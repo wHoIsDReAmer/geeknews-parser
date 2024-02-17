@@ -106,7 +106,7 @@ impl Parser for Velog {
             };
 
             last_post.iter().for_each(|v| {
-                if check_is_contains(&v.title) {
+                if !check_is_contains(&v.title) {
                     let webhook_url = self.webhook_url.clone();
                     let body_data = make_webhook(v.clone());
                     tokio::task::spawn(super::send_webhook(webhook_url, body_data));
