@@ -30,6 +30,10 @@ impl Parser for HadaGeekNews {
             .send()
             .await {
             let body = result.text().await.unwrap_or("".into());
+            if body.is_empty() {
+                return PublicPost::default()
+            }
+
             let topic = body.split("<div class=\'topic_row\'>").collect::<Vec<&str>>();
 
             let topic_title = topic[1].split("<div class=topictitle>").collect::<Vec<&str>>();
