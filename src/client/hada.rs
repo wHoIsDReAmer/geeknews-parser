@@ -48,7 +48,7 @@ impl Parser for HadaGeekNews {
             return PublicPost {
                 title: topic_title.to_string(),
                 content: topic_desc.to_string(),
-                link: format!("https://news.hada.io/{}", topic_id),
+                link: topic_id.to_string(),
                 href: topic_link.to_string()
             }
         }
