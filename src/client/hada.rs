@@ -75,7 +75,7 @@ impl Parser for HadaGeekNews {
             }
 
             self.last_post = post;
-            let _ = tokio::time::sleep(Duration::from_secs(1));
+            let _ = tokio::time::sleep(Duration::from_secs(1)).await;
         }
     }
 }

@@ -114,7 +114,7 @@ impl Parser for Velog {
             });
 
             self.last_posts = last_post;
-            let _ = tokio::time::sleep(Duration::from_secs(60));
+            let _ = tokio::time::sleep(Duration::from_secs(60)).await;
         }
     }
 }
